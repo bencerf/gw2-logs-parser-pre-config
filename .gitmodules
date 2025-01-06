@@ -1,0 +1,6 @@
+[submodule "GW2-Elite-Insights-Parser"]
+	path = GW2-Elite-Insights-Parser
+	url = https://github.com/baaron4/GW2-Elite-Insights-Parser.git
+[submodule "arcdps_top_stats_parser"]
+	path = arcdps_top_stats_parser
+	url = https://github.com/Drevarr/arcdps_top_stats_parser.git
