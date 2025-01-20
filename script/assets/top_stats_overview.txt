@@ -1,0 +1,143 @@
+Welcome to the CARROT AWARDS!
+
+The following stats are computed over 23 out of 23 fights.
+
+Squad overall did 69431519 damage, ripped 9963 boons, generated 2h 59m 41s of stab, cleansed 38865 conditions, healed for 29787094, generated 14221050 barrier, killed 343 enemies and had 120 deaths over a total time of 1h 13m 53s in 23 fights.
+There were between 27 and 35 allied players involved (average 33.0 players).
+The squad faced between 10 and 73 enemy players (average 41.7 players).
+
+DAMAGE AWARDS
+
+Top Damage consistency awards (Max. 5 places, min. 50% of most consistent)
+Most times placed in the top 5. 
+Attendance = number of fights a player was present out of 23 total fights.
+-------------------------------------------------------------------------------
+    Name     Class         Attendance  Times Top     Total
+ 1. Anon 6   Dragonhunter          23         21   7713349
+ 2. Anon 7   Weaver                22         20   7989871
+ 3. Anon 14  Dragonhunter          23         18   6641302
+ 4. Anon 5   Scourge               23         10   4075747
+ 5. Anon 25  Herald                23          9   4070452
+
+
+Top overall Damage awards (Max. 5 places, min. 50% of 1st place)
+Attendance = total duration of fights attended out of 1h 13m 53s.
+------------------------------------------------------------------------
+    Name     Class          Attendance     Total
+ 1. Anon 7   Weaver         1h 13m 23s   7989871
+ 2. Anon 6   Dragonhunter   1h 13m 53s   7713349
+ 3. Anon 14  Dragonhunter   1h 13m 53s   6641302
+ 4. Anon 17  Scourge        1h 13m 53s   4113915
+ 5. Anon 5   Scourge        1h 13m 53s   4075747
+
+
+BOON STRIPS AWARDS
+
+Top Boon Strips consistency awards (Max. 3 places, min. 50% of most consistent)
+Most times placed in the top 3. 
+Attendance = number of fights a player was present out of 23 total fights.
+-------------------------------------------------------------------------------
+    Name     Class         Attendance  Times Top     Total
+ 1. Anon 1   Chronomancer          23         19      1859
+ 2. Anon 5   Scourge               23         16      1218
+ 3. Anon 17  Scourge               23         12      1151
+
+
+Top overall Boon Strips awards (Max. 3 places, min. 50% of 1st place)
+Attendance = total duration of fights attended out of 1h 13m 53s.
+------------------------------------------------------------------------
+    Name     Class          Attendance     Total
+ 1. Anon 1   Chronomancer   1h 13m 53s      1859
+ 2. Anon 5   Scourge        1h 13m 53s      1218
+ 3. Anon 17  Scourge        1h 13m 53s      1151
+
+
+STABILITY OUTPUT AWARDS
+
+Top Stability Output consistency awards (Max. 3 places, min. 50% of most consistent)
+Most times placed in the top 3. 
+Attendance = number of fights a player was present out of 23 total fights.
+-------------------------------------------------------------------------------
+    Name     Class      Attendance  Times Top     Total  Average
+ 1. Anon 9   Firebrand          23         22  1442.07s     0.33
+ 2. Anon 12  Firebrand          22         16  1014.98s     0.23
+ 3. Anon 3   Firebrand          23         11  1014.19s     0.23
+
+
+Top overall Stability Output awards (Max. 3 places, min. 50% of 1st place)
+Attendance = total duration of fights attended out of 1h 13m 53s.
+------------------------------------------------------------------------
+    Name     Class       Attendance     Total  Average
+ 1. Anon 9   Firebrand   1h 13m 53s     1442s     0.33
+ 2. Anon 12  Firebrand   1h 13m 23s     1015s     0.23
+ 3. Anon 3   Firebrand   1h 13m 53s     1014s     0.23
+
+
+CONDITION CLEANSES AWARDS
+
+Top Condition Cleanses consistency awards (Max. 3 places, min. 50% of most consistent)
+Most times placed in the top 3. 
+Attendance = number of fights a player was present out of 23 total fights.
+-------------------------------------------------------------------------------
+    Name     Class     Attendance  Times Top     Total
+ 1. Anon 8   Scrapper          23         19      5945
+ 2. Anon 18  Scrapper          23         17      5078
+ 3. Anon 32  Scrapper          23         16      4986
+
+
+Top overall Condition Cleanses awards (Max. 3 places, min. 50% of 1st place)
+Attendance = total duration of fights attended out of 1h 13m 53s.
+------------------------------------------------------------------------
+    Name     Class      Attendance     Total
+ 1. Anon 8   Scrapper   1h 13m 53s      5945
+ 2. Anon 18  Scrapper   1h 13m 53s      5078
+ 3. Anon 32  Scrapper   1h 13m 53s      4986
+
+
+HEALING AWARDS
+
+Top Healing consistency awards (Max. 3 places, min. 50% of most consistent)
+Most times placed in the top 3. 
+Attendance = number of fights a player was present out of 23 total fights.
+-------------------------------------------------------------------------------
+    Name     Class     Attendance  Times Top     Total
+ 1. Anon 26  Scrapper          23         19   5690446
+ 2. Anon 32  Scrapper          23         18   5346629
+ 3. Anon 8   Scrapper          23         15   4239119
+
+
+Top overall Healing awards (Max. 3 places, min. 50% of 1st place)
+Attendance = total duration of fights attended out of 1h 13m 53s.
+------------------------------------------------------------------------
+    Name     Class      Attendance     Total
+ 1. Anon 26  Scrapper   1h 13m 53s   5690446
+ 2. Anon 32  Scrapper   1h 13m 53s   5346629
+ 3. Anon 8   Scrapper   1h 13m 53s   4239119
+
+
+DISTANCE TO TAG AWARDS
+
+Top Distance to Tag percentage (Minimum percentage = 39%)
+------------------------------------------------------------------------
+    Name     Class          Percentage  Times Top  Out of
+ 1. Anon 32  Scrapper              78%         18      23 
+ 2. Anon 0   Scourge               63%         12      19 
+ 3. Anon 17  Scourge               60%         14      23 
+ 4. Anon 1   Chronomancer          56%         13      23 
+ 5. Anon 35  Firebrand             53%          8      15 
+
+
+JACK OF ALL TRADES (swapped build at least once)
+
+Top Damage percentage (Minimum percentage = 18%)
+------------------------------------------------------------------------
+    Name     Class          Percentage  Times Top  Out of    Total
+ 1. Anon 28  Dragonhunter          25%          2       8   839991
+
+
+Top Deaths percentage (Minimum percentage = 20%)
+------------------------------------------------------------------------
+    Name     Class       Percentage  Times Top  Out of    Total
+ 1. Anon 35  Firebrand          86%         13      15        3
+
+
