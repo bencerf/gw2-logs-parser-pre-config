@@ -4,23 +4,36 @@ $configTable = @{}
 Get-Content -Path $configFile | ForEach-Object {
   if ($_ -match '=') {
     $key, $value = $_ -split '='
-    $resolvedPath = Resolve-Path -Path $value.Trim('"') -ErrorAction SilentlyContinue
-    if ($resolvedPath) {
-      $configTable[$key.Trim()] = $resolvedPath.Path
-    }
-    else {
-      Write-Error "Config not found: $value"
-    }
+    $configTable[$key.Trim()] = $value.Trim('"')
   }
 }
 
 # Retrieve values from the config hashtable
 if (-not $configTable.ContainsKey("ARC_DPS_LOGS_DIR")) {
-  Write-Error "ARC_DPS_LOGS_DIR not found. Check your edit_me.conf file."
+  Write-Error "ARC_DPS_LOGS_DIR not found. Please check your edit_me.conf file."
   exit 1
 }
 $arcDpslogsDir = $configTable["ARC_DPS_LOGS_DIR"]
-# TODO: Add date or not
+$resolvedPath = Resolve-Path -Path $arcDpslogsDir -ErrorAction SilentlyContinue
+if (-not $resolvedPath) {
+  Write-Error "Cannot resolve the ARC_DPS_LOGS_DIR path. Please provide in edit_me.conf file a correct path (e.g. `C:\Program Files (x86)\Guild Wars 2\addons\arcdps\arcdps.cbtlogs\WvW (1)\Player`)."
+  exit 1
+}
+
+# Retrieve date from the config hashtable
+if ($configTable.ContainsKey("DATE")) {
+  $dateFilter = $configTable["DATE"]
+  if ($dateFilter -eq "") {
+    $dateFilter = (Get-Date).ToString("yyyyMMdd")
+  }
+  elseif ($dateFilter -notmatch '^\d{8}$') {
+    Write-Error "Invalid DATE format. Please use YYYYMMDD format."
+    exit 1
+  }
+}
+else {
+  $dateFilter = (Get-Date).ToString("yyyyMMdd")
+}
 
 # Specific script paths
 # TODO: fetch latest, instead static
@@ -32,7 +45,6 @@ $dataPath = ".\data"
 $logsPath = ".\data\logs"
 $jsonPath = ".\data\json"
 $tidPath = ".\data\tid"
-$htmlPath = ".\data\html"
 
 # Initialize and update Git submodules
 # Update latest repositories if Git is installed
@@ -43,16 +55,18 @@ if (Get-Command git -ErrorAction SilentlyContinue) {
   git submodule update
 }
 else {
-  Write-Error "Git not installed, can't initialize and fetch needed repositories."
+  Write-Error "Git not installed, can't initialize and fetch needed repositories. Please install it from https://git-scm.com/downloads."
   exit 1
 }
 
 # Prepare the environment for the Python script
 Write-Output "##############################################################################"
 Write-Output "### 1. Prepare the environment ###############################################"
-Write-Output "##############################################################################"
+Write-Output "###### Configuration #########################################################"
+Write-Output "###### In-game logs path:     $arcDpslogsDir"
+Write-Output "###### Extract date:          $dateFilter"
 ## Check if python3 is installed to continue, and install required Python packages
-Write-Output "###### Install required Python packages ######################################"
+Write-Output "######## Install required Python packages ####################################"
 if (-not (Get-Command python -ErrorAction SilentlyContinue)) {
   Write-Error "Python3 is not installed. Please install it from https://www.python.org/downloads/."
   exit 1
@@ -79,17 +93,17 @@ $pipPackages | ForEach-Object {
   }
 }
 ## Remove old data files
-Write-Output "###### Removing old data files ###"
+Write-Output "######## Removing old data files #############################################"
 if ((Test-Path -Path $dataPath)) {
   Remove-Item -Path $dataPath -Recurse -Force
 }
 
 ## Copy specific .zevtc files from arcdps.cbtlogs folder
-Write-Output "###### Copying specific .zevtc files from ArcDps folder ###"
+Write-Output "######## Copying specific .zevtc files from ArcDps folder ####################"
 if (-not (Test-Path -Path $logsPath)) {
   New-Item -ItemType Directory -Path $logsPath > $null
 }
-Copy-Item -Path "$arcDpslogsDir\*.zevtc" -Destination $logsPath
+Copy-Item -Path "$arcDpslogsDir\$dateFilter*.zevtc" -Destination $logsPath
 
 # Copy custom config into respective repositories
 # - Guild_Data.py to arcdps_top_stats_parser
@@ -100,9 +114,8 @@ Copy-Item -Path "$arcDpslogsDir\*.zevtc" -Destination $logsPath
 
 Write-Output "##############################################################################"
 Write-Output "### 2. Parse files & generate stats ##########################################"
-Write-Output "##############################################################################"
 # Convert .zevtc to .json files, using GW2-Elite-Insights-Parser
-Write-Output "###### Converting .zevtc to .json, using GW2-Elite-Insights-Parser ###########"
+Write-Output "######## Converting .zevtc to .json, using GW2-Elite-Insights-Parser #########"
 ## Check if there are .zevtc files to convert
 $zevtcFiles = Get-ChildItem -Path "$logsPath\*.zevtc"
 if ($zevtcFiles.Count -eq 0) {
@@ -113,17 +126,15 @@ if (-not (Test-Path -Path $jsonPath)) {
   New-Item -ItemType Directory -Path $jsonPath > $null
 }
 foreach ($file in Get-ChildItem -Path "$logsPath\*.zevtc") {
-  # Add verbose option
+  # TODO: add verbose option
   & "$eliteInsightsDir\GuildWars2EliteInsights-CLI.exe" -c "$customConfigPath\EI_detailed_json_combat_replay_custom.conf" "$file" > $null
 }
 Get-ChildItem -Path "$logsPath\*.json" | ForEach-Object {
-  Copy-Item -Path $_.FullName -Destination $jsonPath -Force
+  Move-Item -Path $_.FullName -Destination $jsonPath -Force
 }
 
-# Generate .html file from .json, using arcdps_top_stats_parser
-Write-Output "###### Generating .html file from .json, using arcdps_top_stats_parser #######"
-
-## Generate .tid files from .json
+# Generate .tid file from .json, using arcdps_top_stats_parser
+Write-Output "######## Generating .tid file from .json, using arcdps_top_stats_parser ######"
 python "$topStatsParserDir\TW5_parse_top_stats_detailed.py" $jsonPath > $null
 if (-not (Test-Path -Path $tidPath)) {
   New-Item -ItemType Directory -Path $tidPath > $null
@@ -131,10 +142,13 @@ if (-not (Test-Path -Path $tidPath)) {
 Get-ChildItem -Path "$jsonPath\*.tid" | ForEach-Object {
   Copy-Item -Path $_.FullName -Destination $tidPath -Force
 }
-## Generate .html files from .tid
-if (-not (Test-Path -Path $htmlPath)) {
-  New-Item -ItemType Directory -Path $htmlPath > $null
-}
+
+Write-Output "##############################################################################"
+Write-Output "### 3. Upload .tid to show in web page #######################################"
+Write-Output "##############################################################################"
+Write-Output ""
+Write-Output "==> Please import .tid files to your hosted TW5_Top_Stat_Parse.html, then press red top-right Save button to get the .html file. <=="
+Write-Output ""
 
 # Success! \o/
 exit 0
