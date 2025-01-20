@@ -21,13 +21,13 @@ if (-not $resolvedPath) {
 }
 
 # Retrieve date from the config hashtable
-if ($configTable.ContainsKey("DATE")) {
-  $dateFilter = $configTable["DATE"]
+if ($configTable.ContainsKey("EXTRACT_DATE")) {
+  $dateFilter = $configTable["EXTRACT_DATE"]
   if ($dateFilter -eq "") {
     $dateFilter = (Get-Date).ToString("yyyyMMdd")
   }
   elseif ($dateFilter -notmatch '^\d{8}$') {
-    Write-Error "Invalid DATE format. Please use YYYYMMDD format."
+    Write-Error "Invalid EXTRACT_DATE format. Please use YYYYMMDD format."
     exit 1
   }
 }

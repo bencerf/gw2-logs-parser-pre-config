@@ -17,8 +17,9 @@ In `script/` folder:
 0. Please install the requiered softwares (see. [System Requirements](https://github.com/bencerf/gw2-logs-parser-pre-config?tab=readme-ov-file#system-requirements))
 1. Open `edit_me.conf` file and specify:
    - `ARC_DPS_LOGS_DIR`: path of you ArcDps Logs directory containing the `.zevtc` files inside
-   - `DATE`: date (in `YYYYMMDD` format) to specifically select files of the given date
-2. Excecute `Generate_HTML.ps1` with Windows PowerShell:
+   - `DATE`: date (in `YYYYMMDD` format) to specifically select files of the current day (`DATE=""`) or the given date
+2. Excecute `Generate_stats_files.exe` \
+   or excecute `Generate_stats_files.ps1` with Windows PowerShell:
 
    - **Without logs:** Right-click > Excute with PowerShell
    - **With logs:** Open Windows PowerShell, navigate to the script folder, and run:
