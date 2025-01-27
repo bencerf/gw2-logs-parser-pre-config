@@ -11,12 +11,14 @@ Get-Content -Path $configFile | ForEach-Object {
 # Retrieve values from the config hashtable
 if (-not $configTable.ContainsKey("ARC_DPS_LOGS_DIR")) {
   Write-Error "ARC_DPS_LOGS_DIR not found. Please check your edit_me.conf file."
+  Read-Host
   exit 1
 }
 $arcDpslogsDir = $configTable["ARC_DPS_LOGS_DIR"]
 $resolvedPath = Resolve-Path -Path $arcDpslogsDir -ErrorAction SilentlyContinue
 if (-not $resolvedPath) {
   Write-Error "Cannot resolve the ARC_DPS_LOGS_DIR path. Please provide in edit_me.conf file a correct path (e.g. `C:\Program Files (x86)\Guild Wars 2\addons\arcdps\arcdps.cbtlogs\WvW (1)\Player`)."
+  Read-Host
   exit 1
 }
 
@@ -28,6 +30,7 @@ if ($configTable.ContainsKey("EXTRACT_DATE")) {
   }
   elseif ($dateFilter -notmatch '^\d{8}$') {
     Write-Error "Invalid EXTRACT_DATE format. Please use YYYYMMDD format."
+    Read-Host
     exit 1
   }
 }
@@ -56,6 +59,7 @@ if (Get-Command git -ErrorAction SilentlyContinue) {
 }
 else {
   Write-Error "Git not installed, can't initialize and fetch needed repositories. Please install it from https://git-scm.com/downloads."
+  Read-Host
   exit 1
 }
 
@@ -69,6 +73,7 @@ Write-Output "###### Extract date:          $dateFilter"
 Write-Output "######## Install required Python packages ####################################"
 if (-not (Get-Command python -ErrorAction SilentlyContinue)) {
   Write-Error "Python3 is not installed. Please install it from https://www.python.org/downloads/."
+  Read-Host
   exit 1
 }
 $pipPackages = @("xlrd", "xlutils", "xlwt", "jsons", "requests", "xlsxwriter")
@@ -85,6 +90,7 @@ $pipPackages | ForEach-Object {
     python -m pip install $_ -q
     if (-not $?) {
       Write-Error "Failed to install package: $_. Please install it manually."
+      Read-Host
       exit 1
     }
   }
@@ -92,6 +98,22 @@ $pipPackages | ForEach-Object {
     Write-Output "Package already installed: $_"
   }
 }
+
+## Fixing `ModuleNotFoundError: No module named 'cgi'` error in TW5_parse_top_stats_tools.py file
+Write-Output "######## Fixing TW5_parse_top_stats_tools.py file ############################"
+$filePath = "..\arcdps_top_stats_parser\TW5_parse_top_stats_tools.py"
+(Get-Content -Path $filePath) | ForEach-Object {
+  if ($_ -match "# from cgi import test") {
+    $_
+  }
+  elseif ($_ -match "from cgi import test") {
+    "# $_"
+  }
+  else {
+    $_
+  }
+} | Set-Content -Path $filePath
+
 ## Remove old data files
 Write-Output "######## Removing old data files #############################################"
 if ((Test-Path -Path $dataPath)) {
@@ -120,6 +142,7 @@ Write-Output "######## Converting .zevtc to .json, using GW2-Elite-Insights-Pars
 $zevtcFiles = Get-ChildItem -Path "$logsPath\*.zevtc"
 if ($zevtcFiles.Count -eq 0) {
   Write-Output "No .zevtc files found to process."
+  Read-Host
   exit 1
 }
 if (-not (Test-Path -Path $jsonPath)) {
@@ -151,4 +174,6 @@ Write-Output "==> Please import .tid files to your hosted TW5_Top_Stat_Parse.htm
 Write-Output ""
 
 # Success! \o/
+Write-Output "Script execution completed. Press Enter to exit."
+Read-Host
 exit 0
