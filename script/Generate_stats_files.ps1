@@ -99,21 +99,6 @@ $pipPackages | ForEach-Object {
   }
 }
 
-## Fixing `ModuleNotFoundError: No module named 'cgi'` error in TW5_parse_top_stats_tools.py file
-Write-Output "######## Fixing TW5_parse_top_stats_tools.py file ############################"
-$filePath = "..\arcdps_top_stats_parser\TW5_parse_top_stats_tools.py"
-(Get-Content -Path $filePath) | ForEach-Object {
-  if ($_ -match "# from cgi import test") {
-    $_
-  }
-  elseif ($_ -match "from cgi import test") {
-    "# $_"
-  }
-  else {
-    $_
-  }
-} | Set-Content -Path $filePath
-
 ## Remove old data files
 Write-Output "######## Removing old data files #############################################"
 if ((Test-Path -Path $dataPath)) {
