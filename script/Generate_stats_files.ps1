@@ -39,8 +39,6 @@ else {
 }
 
 # Specific script paths
-# TODO: fetch latest, instead static
-# $eliteInsightsDir = "..\GW2-Elite-Insights-Parser"
 $eliteInsightsDir = "..\GW2EICLI"
 $topStatsParserDir = "..\arcdps_top_stats_parser"
 $customConfigPath = ".\custom-config"
@@ -49,8 +47,18 @@ $logsPath = ".\data\logs"
 $jsonPath = ".\data\json"
 $tidPath = ".\data\tid"
 
-# Initialize and update Git submodules
-# Update latest repositories if Git is installed
+
+
+# Prepare the environment
+Write-Output "##############################################################################"
+Write-Output "### 1. Prepare the environment ###############################################"
+Write-Output "###### Configuration #########################################################"
+Write-Output "###### In-game logs path:     $arcDpslogsDir"
+Write-Output "###### Extract date:          $dateFilter"
+
+Write-Output "######## Fetch `arcdps_top_stats_parser` @latest version ######################"
+## Initialize and update Git submodules
+## Update latest repositories if Git is installed
 if (Get-Command git -ErrorAction SilentlyContinue) {
   # Initialize your local configuration file
   git submodule init
@@ -62,13 +70,26 @@ else {
   Read-Host
   exit 1
 }
+Write-Output "######## Update GW2-Elite-Insights-Parser CLI @latest version #################"
+$repoUrl = "https://api.github.com/repos/baaron4/GW2-Elite-Insights-Parser/releases/latest"
+$latestReleaseUrl = (Invoke-RestMethod -Uri $repoUrl).assets | Where-Object { $_.name -eq $assetName } | Select-Object -ExpandProperty browser_download_url
+$latestVersion = (Invoke-RestMethod -Uri $repoUrl).tag_name
+$currentVersion = "v3.3.0.1"
+if ($currentVersion -ne $latestVersion) {
+  Write-Output "Downloading & updating GW2EICLI @latest $latestVersion..."
+  $assetName = "GW2EICLI.zip"
+  $latestReleaseUrl = (Invoke-RestMethod -Uri $repoUrl).assets | Where-Object { $_.name -eq $assetName } | Select-Object -ExpandProperty browser_download_url
+  Invoke-WebRequest -Uri $latestReleaseUrl -OutFile $assetName
 
-# Prepare the environment for the Python script
-Write-Output "##############################################################################"
-Write-Output "### 1. Prepare the environment ###############################################"
-Write-Output "###### Configuration #########################################################"
-Write-Output "###### In-game logs path:     $arcDpslogsDir"
-Write-Output "###### Extract date:          $dateFilter"
+  # Unzip the downloaded file
+  Write-Output "Unzipping the latest GW2EICLI.zip..."
+  Expand-Archive -Path $assetName -DestinationPath $eliteInsightsDir -Force
+  Remove-Item -Path $assetName
+}
+else {
+  Write-Output "GW2EICLI already @latest $latestVersion"
+}
+
 ## Check if python3 is installed to continue, and install required Python packages
 Write-Output "######## Install required Python packages ####################################"
 if (-not (Get-Command python -ErrorAction SilentlyContinue)) {
@@ -76,18 +97,19 @@ if (-not (Get-Command python -ErrorAction SilentlyContinue)) {
   Read-Host
   exit 1
 }
+python.exe -m pip install --upgrade pip -q
 $pipPackages = @("xlrd", "xlutils", "xlwt", "jsons", "requests", "xlsxwriter")
 function Test-PythonPackage {
   param (
     [string]$PackageName
   )
   $result = python -c "import $PackageName" 2>&1
-  return ($result -eq "")
+  return ($result -match "ModuleNotFoundError")
 }
 $pipPackages | ForEach-Object {
   if ((Test-PythonPackage -PackageName $_)) {
-    Write-Output "Installing package: $_"
-    python -m pip install $_ -q
+    Write-Output "Installing package: $_..."
+    python.exe -m pip install $_ -q
     if (-not $?) {
       Write-Error "Failed to install package: $_. Please install it manually."
       Read-Host
