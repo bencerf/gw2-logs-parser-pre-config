@@ -24,18 +24,18 @@ if (-not $resolvedPath) {
 
 # Retrieve date from the config hashtable
 if ($configTable.ContainsKey("EXTRACT_DATE")) {
-  $dateFilter = $configTable["EXTRACT_DATE"]
-  if ($dateFilter -eq "") {
-    $dateFilter = (Get-Date).ToString("yyyyMMdd")
+  $extractDate = $configTable["EXTRACT_DATE"]
+  if ($extractDate -eq "") {
+    $extractDate = (Get-Date).ToString("yyyyMMdd")
   }
-  elseif ($dateFilter -notmatch '^\d{8}$') {
+  elseif ($extractDate -notmatch '^\d{8}$') {
     Write-Error "Invalid EXTRACT_DATE format. Please use YYYYMMDD format."
     Read-Host
     exit 1
   }
 }
 else {
-  $dateFilter = (Get-Date).ToString("yyyyMMdd")
+  $extractDate = (Get-Date).ToString("yyyyMMdd")
 }
 
 # Specific script paths
@@ -54,7 +54,7 @@ Write-Output "##################################################################
 Write-Output "### 1. Prepare the environment ###############################################"
 Write-Output "###### Configuration #########################################################"
 Write-Output "###### In-game logs path:     $arcDpslogsDir"
-Write-Output "###### Extract date:          $dateFilter"
+Write-Output "###### Extract date:          $extractDate"
 
 Write-Output "######## Fetch `arcdps_top_stats_parser` @latest version ######################"
 ## Initialize and update Git submodules
@@ -132,7 +132,7 @@ Write-Output "######## Copying specific .zevtc files from ArcDps folder ########
 if (-not (Test-Path -Path $logsPath)) {
   New-Item -ItemType Directory -Path $logsPath > $null
 }
-Copy-Item -Path "$arcDpslogsDir\$dateFilter*.zevtc" -Destination $logsPath
+Copy-Item -Path "$arcDpslogsDir\$extractDate*.zevtc" -Destination $logsPath
 
 # Copy custom config into respective repositories
 # - Guild_Data.py to arcdps_top_stats_parser
@@ -165,10 +165,20 @@ Get-ChildItem -Path "$logsPath\*.json" | ForEach-Object {
 
 # Generate .tid file from .json, using arcdps_top_stats_parser
 Write-Output "######## Generating .tid file from .json, using arcdps_top_stats_parser ######"
-python "$topStatsParserDir\TW5_parse_top_stats_detailed.py" $jsonPath > $null
+## Patch Python to add argument to adjust date with extract date
+$patch = "addExtractDateInArgumentPythonScript.patch"
+$topStatsParserDir = "..\arcdps_top_stats_parser"
+Copy-Item -Path ".\$patch" -Destination $topStatsParserDir -Force
+Set-Location $topStatsParserDir
+git apply $patch -q
+Set-Location "..\script"
+## Running script with extractDate
+$dateTime = [datetime]::ParseExact($extractDate, 'yyyyMMdd', $null).AddHours(20).ToString("yyyy-MM-ddTHH:mm:ss")
+python "$topStatsParserDir\TW5_parse_top_stats_detailed.py" $jsonPath -d "$dateTime" > $null
 if (-not (Test-Path -Path $tidPath)) {
   New-Item -ItemType Directory -Path $tidPath > $null
 }
+## Extract .tid file in a folder
 Get-ChildItem -Path "$jsonPath\*.tid" | ForEach-Object {
   Copy-Item -Path $_.FullName -Destination $tidPath -Force
 }
