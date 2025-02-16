@@ -26,7 +26,7 @@ if (-not $resolvedPath) {
 if ($configTable.ContainsKey("EXTRACT_DATE")) {
   $extractDate = $configTable["EXTRACT_DATE"]
   if ($extractDate -eq "") {
-    $extractDate = (Get-Date).ToString("yyyyMMdd")
+    $extractDate = $null
   }
   elseif ($extractDate -notmatch '^\d{8}$') {
     Write-Error "Invalid EXTRACT_DATE format. Please use YYYYMMDD format."
@@ -35,7 +35,7 @@ if ($configTable.ContainsKey("EXTRACT_DATE")) {
   }
 }
 else {
-  $extractDate = (Get-Date).ToString("yyyyMMdd")
+  $extractDate = $null
 }
 
 # Specific script paths
@@ -49,14 +49,21 @@ $tidPath = ".\data\tid"
 
 
 
+if ($extractDate) {
+  $displayExtractDate = $extractDate
+}
+else {
+  $displayExtractDate = "now"
+}
+
 # Prepare the environment
 Write-Output "##############################################################################"
 Write-Output "### 1. Prepare the environment ###############################################"
 Write-Output "###### Configuration #########################################################"
 Write-Output "###### In-game logs path:     $arcDpslogsDir"
-Write-Output "###### Extract date:          $extractDate"
+Write-Output "###### Extract date:          $displayExtractDate"
 
-Write-Output "######## Fetch `arcdps_top_stats_parser` @latest version ######################"
+Write-Output "######## Fetch arcdps_top_stats_parser @latest version #######################"
 ## Initialize and update Git submodules
 ## Update latest repositories if Git is installed
 if (Get-Command git -ErrorAction SilentlyContinue) {
@@ -70,7 +77,7 @@ else {
   Read-Host
   exit 1
 }
-Write-Output "######## Update GW2-Elite-Insights-Parser CLI @latest version #################"
+Write-Output "######## Update GW2-Elite-Insights-Parser CLI @latest version ################"
 $repoUrl = "https://api.github.com/repos/baaron4/GW2-Elite-Insights-Parser/releases/latest"
 $latestReleaseUrl = (Invoke-RestMethod -Uri $repoUrl).assets | Where-Object { $_.name -eq $assetName } | Select-Object -ExpandProperty browser_download_url
 $latestVersion = (Invoke-RestMethod -Uri $repoUrl).tag_name
@@ -173,8 +180,13 @@ Set-Location $topStatsParserDir
 git apply $patch -q
 Set-Location "..\script"
 ## Running script with extractDate
-$dateTime = [datetime]::ParseExact($extractDate, 'yyyyMMdd', $null).AddHours(20).ToString("yyyy-MM-ddTHH:mm:ss")
-python "$topStatsParserDir\TW5_parse_top_stats_detailed.py" $jsonPath -d "$dateTime" > $null
+if ($extractDate) {
+  $dateTime = [datetime]::ParseExact($extractDate, 'yyyyMMdd', $null).AddHours(20).ToString("yyyy-MM-ddTHH:mm:ss")
+  python "$topStatsParserDir\TW5_parse_top_stats_detailed.py" $jsonPath -d "$dateTime" > $null
+}
+else {
+  python "$topStatsParserDir\TW5_parse_top_stats_detailed.py" $jsonPath > $null
+}
 if (-not (Test-Path -Path $tidPath)) {
   New-Item -ItemType Directory -Path $tidPath > $null
 }
