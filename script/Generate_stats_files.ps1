@@ -81,7 +81,7 @@ Write-Output "######## Update GW2-Elite-Insights-Parser CLI @latest version ####
 $repoUrl = "https://api.github.com/repos/baaron4/GW2-Elite-Insights-Parser/releases/latest"
 $latestReleaseUrl = (Invoke-RestMethod -Uri $repoUrl).assets | Where-Object { $_.name -eq $assetName } | Select-Object -ExpandProperty browser_download_url
 $latestVersion = (Invoke-RestMethod -Uri $repoUrl).tag_name
-$currentVersion = "v3.3.0.1"
+$currentVersion = "v3.5.0.0"
 if ($currentVersion -ne $latestVersion) {
   Write-Output "Downloading & updating GW2EICLI @latest $latestVersion..."
   $assetName = "GW2EICLI.zip"
@@ -140,13 +140,6 @@ if (-not (Test-Path -Path $logsPath)) {
   New-Item -ItemType Directory -Path $logsPath > $null
 }
 Copy-Item -Path "$arcDpslogsDir\$extractDate*.zevtc" -Destination $logsPath
-
-# Copy custom config into respective repositories
-# - Guild_Data.py to arcdps_top_stats_parser
-# if (-not (Test-Path -Path $topStatsParserDir)) {
-#     New-Item -ItemType Directory -Path $topStatsParserDir
-# }
-# Copy-Item -Path "$customConfigPath\Guild_Data.py" -Destination $topStatsParserDir  -Force
 
 Write-Output "##############################################################################"
 Write-Output "### 2. Parse files & generate stats ##########################################"
