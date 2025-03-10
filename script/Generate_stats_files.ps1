@@ -141,13 +141,6 @@ if (-not (Test-Path -Path $logsPath)) {
 }
 Copy-Item -Path "$arcDpslogsDir\$extractDate*.zevtc" -Destination $logsPath
 
-# Copy custom config into respective repositories
-# - Guild_Data.py to arcdps_top_stats_parser
-# if (-not (Test-Path -Path $topStatsParserDir)) {
-#     New-Item -ItemType Directory -Path $topStatsParserDir
-# }
-# Copy-Item -Path "$customConfigPath\Guild_Data.py" -Destination $topStatsParserDir  -Force
-
 Write-Output "##############################################################################"
 Write-Output "### 2. Parse files & generate stats ##########################################"
 # Convert .zevtc to .json files, using GW2-Elite-Insights-Parser
