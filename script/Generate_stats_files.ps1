@@ -21,21 +21,14 @@ if (-not $resolvedPath) {
   Read-Host
   exit 1
 }
-
-# Retrieve date from the config hashtable
+$extractDate = ""
 if ($configTable.ContainsKey("EXTRACT_DATE")) {
   $extractDate = $configTable["EXTRACT_DATE"]
-  if ($extractDate -eq "") {
-    $extractDate = $null
-  }
-  elseif ($extractDate -notmatch '^\d{8}$') {
+  if ($extractDate -ne "" -and $extractDate -notmatch '^\d{8}$') {
     Write-Error "Invalid EXTRACT_DATE format. Please use YYYYMMDD format."
     Read-Host
     exit 1
   }
-}
-else {
-  $extractDate = $null
 }
 
 # Specific script paths
@@ -47,14 +40,16 @@ $logsPath = ".\data\logs"
 $jsonPath = ".\data\json"
 $tidPath = ".\data\tid"
 
-
-
-if ($extractDate) {
-  $displayExtractDate = $extractDate
+# Display correctly the EXTRACT_DATE if it's empty
+if ($extractDate -eq "") {
+  $displayExtractDate = "now"
+  $extractDate = (Get-Date).ToString("yyyyMMdd")
 }
 else {
-  $displayExtractDate = "now"
+  $displayExtractDate = $extractDate
 }
+
+
 
 # Prepare the environment
 Write-Output "##############################################################################"
@@ -173,12 +168,12 @@ Set-Location $topStatsParserDir
 git apply $patch -q
 Set-Location "..\script"
 ## Running script with extractDate
-if ($extractDate) {
-  $dateTime = [datetime]::ParseExact($extractDate, 'yyyyMMdd', $null).AddHours(20).ToString("yyyy-MM-ddTHH:mm:ss")
-  python "$topStatsParserDir\TW5_parse_top_stats_detailed.py" $jsonPath -d "$dateTime" > $null
+if ($displayExtractDate -eq "now") {
+  python "$topStatsParserDir\TW5_parse_top_stats_detailed.py" $jsonPath > $null
 }
 else {
-  python "$topStatsParserDir\TW5_parse_top_stats_detailed.py" $jsonPath > $null
+  $dateTime = [datetime]::ParseExact($extractDate, 'yyyyMMdd', $null).AddHours(22).ToString("yyyy-MM-ddTHH:mm:ss")
+  python "$topStatsParserDir\TW5_parse_top_stats_detailed.py" $jsonPath -d "$dateTime" > $null
 }
 if (-not (Test-Path -Path $tidPath)) {
   New-Item -ItemType Directory -Path $tidPath > $null
